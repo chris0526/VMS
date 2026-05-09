@@ -369,11 +369,11 @@ body {
 
 /* ─── Page Enter ─────────────────────────────────────────────────────── */
 .page-enter {
-  animation: fadeUp 0.3s ease both;
+  animation: pageFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 

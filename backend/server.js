@@ -1,9 +1,14 @@
-const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+require('dotenv').config();
+const FCM = require('fcm-node');
 
 const app = express();
+const fcm = new FCM(process.env.FCM_SERVER_KEY);
 const port = 5000;
+
+const adminRouter = require('./admin_api');
+app.use('/admin', adminRouter);
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -220,11 +225,30 @@ app.post('/api/notify', (req, res) => {
     db.get("SELECT token FROM push_tokens WHERE user_id = ?", [user.id], (err, row) => {
       if (err || !row) return res.status(404).json({ error: "Push token not found for this manager" });
       
-      console.log(`[MOCK PUSH] To: ${manager_name} (${row.token}) | Message: Visitor ${visitor_name} has checked in.`);
+      const message = {
+          to: row.token, 
+          notification: {
+              title: 'Visitor Check-In Alert', 
+              body: `${visitor_name} has just checked in to see you.`,
+              sound: 'default',
+              click_action: 'FCM_PLUGIN_ACTIVITY',
+              icon: 'fcm_push_icon'
+          },
+          data: {
+              visitor_name: visitor_name,
+              type: 'check_in'
+          }
+      };
       
-      // TODO: Implement actual FCM send here when keys are provided
-      // For now, return success to let frontend continue
-      res.json({ success: true, message: "Notification queued" });
+      fcm.send(message, function(err, response){
+          if (err) {
+              console.error("FCM Send Error:", err);
+              return res.status(500).json({ error: "Notification delivery failed" });
+          } else {
+              console.log("Successfully sent with response: ", response);
+              res.json({ success: true, message: "Notification sent" });
+          }
+      });
     });
   });
 });

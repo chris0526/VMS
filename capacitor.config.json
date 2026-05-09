@@ -1,8 +1,13 @@
 {
   "appId": "com.vms.app",
-  "appName": "VMS",
+  "appName": "LKS VMS",
   "webDir": "dist",
+  "bundledWebRuntime": false,
   "server": {
-    "cleartext": true
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  },
+  "android": {
+    "allowMixedContent": true
   }
 }

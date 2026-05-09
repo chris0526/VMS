@@ -133,7 +133,6 @@ function MainApp() {
             <Route path="/invites" element={<ProtectedRoute element={<Invites />} />} />
             <Route path="/deliveries" element={<ProtectedRoute element={<Deliveries />} />} />
             <Route path="/watchlist" element={<ProtectedRoute element={<Watchlist />} />} />
-            <Route path="/evacuation" element={<ProtectedRoute element={<Evacuation />} />} />
           </Routes>
         </main>
       </div>

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 const AuthContext = createContext();
 
@@ -19,10 +20,10 @@ export const AVAILABLE_MODULES = [
 
 export function AuthProvider({ children }) {
   const defaultUsers = [
-    { id: '1', name: 'Super Admin', email: 'admin@vms.com', password: 'admin', role: 'Admin', modules: ['/', '/add', '/logs', '/invites', '/deliveries', '/watchlist', '/evacuation', '/manage', '/settings'] },
-    { id: '2', name: 'Front Desk Guard', email: 'guard@vms.com', password: 'guard', role: 'Guard', modules: ['/', '/add', '/logs', '/deliveries', '/watchlist', '/evacuation', '/manage'] },
+    { id: '1', name: 'Super Admin', email: 'admin@vms.com', password: 'admin', role: 'Admin', modules: ['/', '/add', '/logs', '/invites', '/deliveries', '/watchlist', '/settings'] },
+    { id: '2', name: 'Front Desk Guard', email: 'guard@vms.com', password: 'guard', role: 'Guard', modules: ['/', '/add', '/logs', '/deliveries', '/watchlist'] },
     { id: '3', name: 'Deepak Sharma', email: 'deepak@vms.com', password: 'password', role: 'Manager', modules: ['/', '/logs', '/invites'] },
-    { id: '4', name: 'User', email: 'user@vms.com', password: 'user123', role: 'Admin', modules: ['/', '/add', '/logs', '/invites', '/deliveries', '/watchlist', '/evacuation', '/manage', '/settings'] },
+    { id: '4', name: 'User', email: 'user@vms.com', password: 'user123', role: 'Admin', modules: ['/', '/add', '/logs', '/invites', '/deliveries', '/watchlist', '/settings'] },
   ];
 
   const [users, setUsers] = useState([]);
@@ -65,6 +66,22 @@ export function AuthProvider({ children }) {
     const user = users.find(u => u.email === email && u.password === password);
     if (user) {
       setCurrentUser(user);
+      
+      // Register for push notifications
+      PushNotifications.requestPermissions().then(result => {
+        if (result.receive === 'granted') {
+          PushNotifications.register();
+        }
+      });
+
+      PushNotifications.addListener('registration', (token) => {
+        fetch(`${apiBaseUrl}/api/push-tokens`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id, token: token.value })
+        });
+      });
+
       return { success: true };
     }
     return { success: false, message: 'Invalid email or password' };

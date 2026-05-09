@@ -17,12 +17,6 @@ function Manage() {
       path: '/watchlist', 
       icon: <ShieldAlert size={28} color="var(--warning)" />, 
       desc: 'Manage restricted or banned individuals' 
-    },
-    { 
-      name: 'Emergency Roll Call', 
-      path: '/evacuation', 
-      icon: <AlertTriangle size={28} color="var(--danger)" />, 
-      desc: 'Account for all on-site visitors during an emergency' 
     }
   ];
 
